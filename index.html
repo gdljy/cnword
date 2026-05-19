@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>📖 百字识字 · 语音闯关</title>
     <style>
         * {
@@ -12,18 +12,17 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 安卓平板专用优化 */
         body {
             background: linear-gradient(135deg, #1a472a 0%, #0d2b1a 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Roboto', 'Noto Sans CJK SC', 'Droid Sans Fallback', system-ui, -apple-system, sans-serif;
-            padding: 20px;
+            font-family: 'Segoe UI', 'Roboto', 'Noto Sans CJK SC', system-ui, sans-serif;
+            padding: 16px;
         }
 
-        .container {
+        .game-card {
             background: #fffef7;
             border-radius: 48px;
             max-width: 700px;
@@ -32,498 +31,389 @@
             box-shadow: 0 25px 50px rgba(0,0,0,0.3);
         }
 
-        /* 头部 */
         .header {
             background: #ffb347;
-            padding: 20px 28px;
+            padding: 20px 24px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
             flex-wrap: wrap;
             gap: 12px;
         }
 
-        .score-box, .progress-box {
+        .score, .progress {
             background: #2c2b26;
-            padding: 10px 24px;
-            border-radius: 60px;
+            padding: 8px 20px;
+            border-radius: 40px;
             color: #ffd966;
-            font-size: 1.1rem;
             font-weight: bold;
         }
 
-        .score-box span, .progress-box span {
+        .score span, .progress span {
             color: white;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 800;
-            margin-right: 8px;
+            margin-right: 6px;
         }
 
-        /* 汉字区域 - 平板大字体 */
-        .word-container {
+        .word-area {
             background: #faf3e0;
-            margin: 30px 25px;
-            border-radius: 56px;
+            margin: 30px 20px;
+            border-radius: 48px;
             padding: 50px 20px;
             text-align: center;
-            box-shadow: inset 0 2px 8px rgba(0,0,0,0.05), 0 12px 28px rgba(0,0,0,0.12);
+            min-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .character {
-            font-size: 160px;
+        .word {
+            font-size: 140px;
             font-weight: 900;
             color: #2d5016;
-            font-family: 'Noto Sans CJK SC', 'Roboto', 'Droid Sans Fallback', 'PingFang SC', 'Microsoft YaHei', serif;
-            text-shadow: 4px 4px 12px rgba(0,0,0,0.1);
-            line-height: 1.2;
-            letter-spacing: 8px;
+            font-family: 'Noto Sans CJK SC', 'Segoe UI', 'Roboto', sans-serif;
+            text-shadow: 3px 3px 8px rgba(0,0,0,0.1);
             background: #fff8f0;
-            padding: 30px 20px;
-            border-radius: 48px;
+            padding: 25px;
+            border-radius: 40px;
             display: inline-block;
             width: 100%;
         }
 
-        /* 信息面板 */
-        .info-area {
+        .info-card {
             background: #f0edd5;
-            margin: 10px 25px;
-            padding: 18px 20px;
-            border-radius: 48px;
+            margin: 10px 20px;
+            padding: 16px;
+            border-radius: 40px;
             text-align: center;
         }
 
-        .mic-badge {
+        .mic-status {
             display: inline-block;
-            padding: 8px 20px;
+            padding: 6px 18px;
             background: #e8e0c8;
-            border-radius: 40px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #5a4a2a;
-            margin-bottom: 10px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
         }
 
-        .message {
-            font-size: 1rem;
+        .hint {
+            font-size: 0.95rem;
             color: #5a6e3a;
-            line-height: 1.5;
         }
 
-        /* 按钮 - 适合手指点击的大按钮 */
-        .button-bar {
+        .buttons {
             display: flex;
-            gap: 20px;
-            padding: 20px 25px 35px;
+            gap: 16px;
+            padding: 16px 20px 30px;
         }
 
-        .btn {
+        button {
             flex: 1;
-            padding: 18px 12px;
+            padding: 16px;
             border: none;
-            border-radius: 60px;
-            font-size: 1.2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.1s ease;
             font-family: inherit;
-            letter-spacing: 2px;
         }
 
         .btn-speak {
             background: #ff9f4a;
             color: white;
-            box-shadow: 0 5px 0 #c96f1e;
+            box-shadow: 0 4px 0 #c96f1e;
         }
 
         .btn-reset {
             background: #cdd9c7;
             color: #3a5230;
-            box-shadow: 0 5px 0 #9bae8c;
+            box-shadow: 0 4px 0 #9bae8c;
         }
 
-        .btn:active {
-            transform: translateY(3px);
+        button:active {
+            transform: translateY(2px);
             box-shadow: none;
         }
 
-        .btn:disabled {
-            opacity: 0.5;
-            transform: none;
-        }
-
-        /* 录音动画 */
-        .recording {
+        .listening {
             background: #ff5722 !important;
-            animation: recordingPulse 0.8s infinite;
+            animation: pulse 0.8s infinite;
         }
 
-        @keyframes recordingPulse {
+        @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; background: #e64a19; }
+            50% { opacity: 0.7; }
         }
 
-        /* 反馈动画 */
-        .correct-effect {
+        .correct-flash {
             background: #c8e6b5 !important;
-            transition: 0.15s;
         }
 
-        .wrong-effect {
-            transform: scale(0.95);
-        }
-
-        /* 平板横屏适配 */
-        @media (min-width: 800px) and (orientation: landscape) {
-            .character { font-size: 140px; }
-            .word-container { padding: 40px 20px; }
-            .btn { padding: 16px; font-size: 1.1rem; }
-        }
-
-        /* 手机竖屏 */
         @media (max-width: 600px) {
-            .character { font-size: 80px; padding: 20px; }
-            .word-container { padding: 30px 15px; margin: 20px; }
-            .btn { padding: 14px; font-size: 1rem; }
-            .score-box span, .progress-box span { font-size: 1.4rem; }
-        }
-
-        /* 小手机 */
-        @media (max-width: 400px) {
-            .character { font-size: 60px; }
-            .header { padding: 15px 20px; }
+            .word { font-size: 80px; padding: 15px; }
+            .word-area { padding: 30px 15px; }
         }
 
         footer {
             text-align: center;
-            padding: 15px;
+            padding: 12px;
             font-size: 11px;
             color: #a7b89e;
-            background: #fffef7;
             border-top: 1px solid #efe3cd;
         }
     </style>
 </head>
 <body>
-<div class="container">
+<div class="game-card">
     <div class="header">
-        <div class="score-box">🏆 得分 <span id="scoreDisplay">0</span></div>
-        <div class="progress-box">📖 进度 <span id="progressDisplay">0</span>/<span id="totalDisplay">100</span></div>
+        <div class="score">🏆 得分 <span id="scoreVal">0</span></div>
+        <div class="progress">📖 进度 <span id="progressVal">0</span>/<span id="totalVal">100</span></div>
     </div>
 
-    <div class="word-container">
-        <div class="character" id="currentChar">一</div>
+    <div class="word-area">
+        <div class="word" id="character">一</div>
     </div>
 
-    <div class="info-area" id="infoArea">
-        <div class="mic-badge" id="micStatus">🎙️ 准备就绪</div>
-        <div class="message" id="tipMessage">👇 点击下方橙色按钮，大声朗读汉字</div>
+    <div class="info-card" id="infoCard">
+        <div class="mic-status" id="micStatus">🎙️ 准备</div>
+        <div class="hint" id="hintMsg">👇 点击橙色按钮，大声朗读</div>
     </div>
 
-    <div class="button-bar">
-        <button class="btn btn-speak" id="speakButton">🎤 朗读</button>
-        <button class="btn btn-reset" id="resetButton">🔄 重来</button>
+    <div class="buttons">
+        <button class="btn-speak" id="speakBtn">🎤 朗读</button>
+        <button class="btn-reset" id="resetBtn">🔄 重置</button>
     </div>
-    <footer>📢 大声朗读 → 自动识别 → 正确得分 → 进入下一字</footer>
+    <footer>📢 提示：Edge浏览器需要点击两次按钮才能启动麦克风</footer>
 </div>
 
 <script>
-    // ==================== 100个生字库 ====================
-    const CHARACTER_LIBRARY = [
-        "一", "二", "三", "四", "五", "六", "七", "八", "九", "十",
-        "人", "口", "手", "足", "耳", "目", "日", "月", "水", "火",
-        "山", "石", "田", "土", "木", "林", "森", "云", "风", "雨",
-        "电", "天", "地", "爸", "妈", "哥", "姐", "弟", "妹", "爷",
-        "奶", "大", "小", "多", "少", "上", "下", "左", "右", "前",
-        "后", "来", "去", "走", "跑", "跳", "笑", "哭", "吃", "喝",
-        "唱", "画", "写", "读", "书", "笔", "纸", "桌", "椅", "门",
-        "窗", "花", "草", "树", "叶", "红", "绿", "黄", "蓝", "白",
-        "黑", "猫", "狗", "鸟", "鱼", "虫", "牛", "羊", "马", "兔",
-        "星", "光", "亮", "明", "暗", "香", "甜", "苦", "乐", "喜"
-    ];
+    // 100个汉字
+    const WORDS = "一 二 三 四 五 六 七 八 九 十 人 口 手 足 耳 目 日 月 水 火 山 石 田 土 木 林 森 云 风 雨 电 天 地 爸 妈 哥 姐 弟 妹 爷 奶 大 小 多 少 上 下 左 右 前 后 来 去 走 跑 跳 笑 哭 吃 喝 唱 画 写 读 书 笔 纸 桌 椅 门 窗 花 草 树 叶 红 绿 黄 蓝 白 黑 猫 狗 鸟 鱼 虫 牛 羊 马 兔 星 光 亮 明 暗 香 甜 苦 乐 喜".split(" ");
     
-    const TOTAL_COUNT = CHARACTER_LIBRARY.length;
-    document.getElementById('totalDisplay').innerText = TOTAL_COUNT;
+    const TOTAL = WORDS.length;
+    document.getElementById('totalVal').innerText = TOTAL;
     
-    // 游戏状态
-    let currentIdx = 0;          // 当前第几个 (0-99)
-    let currentScore = 0;        // 当前得分
-    let speechRecognition = null;
-    let isRecognizingActive = false;
+    let idx = 0, score = 0;
+    let recognition = null;
+    let isActive = false;
+    let edgeRetryCount = 0;
     
-    // DOM 元素
-    const charElement = document.getElementById('currentChar');
-    const scoreElement = document.getElementById('scoreDisplay');
-    const progressElement = document.getElementById('progressDisplay');
-    const speakBtn = document.getElementById('speakButton');
-    const resetBtn = document.getElementById('resetButton');
-    const micStatusSpan = document.getElementById('micStatus');
-    const tipSpan = document.getElementById('tipMessage');
-    const infoArea = document.getElementById('infoArea');
+    const charEl = document.getElementById('character');
+    const scoreEl = document.getElementById('scoreVal');
+    const progressEl = document.getElementById('progressVal');
+    const speakBtn = document.getElementById('speakBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const micStatus = document.getElementById('micStatus');
+    const hintMsg = document.getElementById('hintMsg');
+    const infoCard = document.getElementById('infoCard');
     
-    // ========== 更新界面 ==========
-    function updateGameUI() {
-        scoreElement.innerText = currentScore;
-        progressElement.innerText = currentIdx;
-        
-        if (currentIdx < TOTAL_COUNT) {
-            charElement.innerText = CHARACTER_LIBRARY[currentIdx];
-            charElement.style.fontSize = '';
+    function updateDisplay() {
+        scoreEl.innerText = score;
+        progressEl.innerText = idx;
+        if (idx < TOTAL) {
+            charEl.innerText = WORDS[idx];
         } else {
-            charElement.innerText = '🎉🏆🎉';
-            charElement.style.fontSize = '80px';
+            charEl.innerText = "🎉";
         }
     }
     
-    // 显示提示（无弹窗）
-    function showTipMessage(msg, isError = false) {
-        tipSpan.innerText = msg;
-        tipSpan.style.color = isError ? '#d9534f' : '#5a6e3a';
-        // 3秒后恢复默认提示（如果不是错误状态且游戏未结束）
-        if (!isError && currentIdx < TOTAL_COUNT) {
-            setTimeout(() => {
-                if (tipSpan.innerText === msg && currentIdx < TOTAL_COUNT && !isRecognizingActive) {
-                    tipSpan.innerText = '🎤 点击「朗读」按钮继续挑战';
-                    tipSpan.style.color = '#5a6e3a';
-                }
-            }, 2000);
-        }
+    function setMessage(msg, isError = false) {
+        hintMsg.innerText = msg;
+        hintMsg.style.color = isError ? '#c0392b' : '#5a6e3a';
     }
     
-    function setMicStatusText(text, isActive = false) {
-        micStatusSpan.innerText = text;
-        micStatusSpan.style.background = isActive ? '#ffd699' : '#e8e0c8';
+    function setMic(text) {
+        micStatus.innerText = text;
     }
     
-    // ========== 正确得分处理 ==========
-    function handleCorrectAnswer() {
-        if (currentIdx >= TOTAL_COUNT) return;
+    function correctAndNext() {
+        if (idx >= TOTAL) return;
+        score++;
+        idx++;
+        updateDisplay();
         
-        // 加分并前进
-        currentScore++;
-        currentIdx++;
-        updateGameUI();
+        infoCard.classList.add('correct-flash');
+        setTimeout(() => infoCard.classList.remove('correct-flash'), 300);
+        setMessage('✅ 正确！ +1分');
+        setMic('🎉 正确');
         
-        // 正确反馈效果
-        infoArea.classList.add('correct-effect');
-        setTimeout(() => infoArea.classList.remove('correct-effect'), 300);
-        showTipMessage('✅ 读音正确！ +1分 进入下一字', false);
-        setMicStatusText('🎉 正确！');
-        
-        // 通关检测
-        if (currentIdx === TOTAL_COUNT) {
-            showTipMessage(`🏆 恭喜通关！ 得分 ${currentScore}/${TOTAL_COUNT} 🏆`, false);
-            setMicStatusText('🏆 通关完成');
+        if (idx === TOTAL) {
+            setMessage(`🏆 通关！ ${score}/${TOTAL} 分 🏆`);
+            setMic('🏆 完成');
             speakBtn.disabled = true;
-            if (speechRecognition && isRecognizingActive) {
-                try { speechRecognition.stop(); } catch(e) {}
-                isRecognizingActive = false;
+            if (recognition && isActive) {
+                try { recognition.stop(); } catch(e) {}
+                isActive = false;
             }
-            speakBtn.classList.remove('recording');
+            speakBtn.classList.remove('listening');
             return;
         }
         
-        // 停止当前识别，让用户重新点击按钮
-        if (speechRecognition && isRecognizingActive) {
-            try { speechRecognition.stop(); } catch(e) {}
-            isRecognizingActive = false;
-            speakBtn.classList.remove('recording');
+        if (recognition && isActive) {
+            try { recognition.stop(); } catch(e) {}
+            isActive = false;
+            speakBtn.classList.remove('listening');
         }
         
-        // 延迟恢复提示
         setTimeout(() => {
-            if (currentIdx < TOTAL_COUNT && !isRecognizingActive) {
-                setMicStatusText('🎙️ 就绪');
-                tipSpan.innerText = '🎤 点击「朗读」继续';
-                tipSpan.style.color = '#5a6e3a';
+            if (idx < TOTAL && !isActive) {
+                setMessage('🎤 点击「朗读」继续');
+                setMic('🎙️ 就绪');
             }
-        }, 1200);
+        }, 1000);
     }
     
-    // ========== 语音识别初始化（安卓优化） ==========
-    function initSpeechForAndroid() {
-        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            showTipMessage('❌ 当前浏览器不支持语音识别，请使用Chrome浏览器', true);
+    // Edge专用语音初始化
+    function initEdgeSpeech() {
+        // Edge支持 webkitSpeechRecognition
+        const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (!SpeechRecognitionAPI) {
+            setMessage('❌ 浏览器不支持语音识别，请安装Chrome浏览器', true);
             speakBtn.disabled = true;
             return false;
         }
         
-        const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-        speechRecognition = new SpeechRecognitionAPI();
-        
-        // 安卓优化配置
-        speechRecognition.continuous = false;      // 单次识别
-        speechRecognition.interimResults = false;  // 只取最终结果
-        speechRecognition.lang = 'zh-CN';          // 中文普通话
-        speechRecognition.maxAlternatives = 1;
-        
-        // 开始识别
-        speechRecognition.onstart = () => {
-            isRecognizingActive = true;
-            speakBtn.classList.add('recording');
-            setMicStatusText('🎤 聆听中... 请朗读', true);
-            showTipMessage('🗣️ 大声朗读上面的汉字', false);
-        };
-        
-        // 识别错误（静默处理）
-        speechRecognition.onerror = (event) => {
-            console.log('识别错误:', event.error);
-            isRecognizingActive = false;
-            speakBtn.classList.remove('recording');
+        try {
+            recognition = new SpeechRecognitionAPI();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'zh-CN';
             
-            if (currentIdx >= TOTAL_COUNT) return;
+            recognition.onstart = () => {
+                isActive = true;
+                speakBtn.classList.add('listening');
+                setMic('🎤 聆听中...');
+                setMessage('🗣️ 大声朗读上面的汉字');
+                edgeRetryCount = 0;
+            };
             
-            let errorMsg = '';
-            if (event.error === 'not-allowed') {
-                errorMsg = '🎤 需要麦克风权限，请在弹窗中点击「允许」';
-                setMicStatusText('🔇 需要授权');
-            } else if (event.error === 'no-speech') {
-                errorMsg = '没有听到声音，请重试';
-                setMicStatusText('🎙️ 未检测到声音');
-            } else {
-                errorMsg = '识别失败，请再试一次';
-                setMicStatusText('🎙️ 重试');
-            }
-            showTipMessage(errorMsg, true);
-            
-            // 3秒后恢复按钮状态
-            setTimeout(() => {
-                if (!isRecognizingActive && currentIdx < TOTAL_COUNT) {
-                    setMicStatusText('🎙️ 点击朗读');
-                }
-            }, 2000);
-        };
-        
-        // 识别结束
-        speechRecognition.onend = () => {
-            speakBtn.classList.remove('recording');
-            isRecognizingActive = false;
-            if (currentIdx < TOTAL_COUNT && !speakBtn.disabled) {
-                setMicStatusText('🎙️ 点击朗读');
-            }
-        };
-        
-        // 识别结果
-        speechRecognition.onresult = (event) => {
-            const resultText = event.results[0][0].transcript;
-            const targetChar = CHARACTER_LIBRARY[currentIdx];
-            
-            // 提取第一个汉字
-            const chineseMatch = resultText.match(/[\u4e00-\u9fa5]/);
-            const spokenChar = chineseMatch ? chineseMatch[0] : '';
-            
-            if (spokenChar === targetChar) {
-                handleCorrectAnswer();
-            } else {
-                // 错误反馈
-                showTipMessage(`❌ 读音「${spokenChar || resultText}」≠「${targetChar}」, 再试试`, true);
-                setMicStatusText('🔁 读音不对');
+            recognition.onerror = (e) => {
+                console.log('Edge错误:', e.error);
+                isActive = false;
+                speakBtn.classList.remove('listening');
                 
-                // 汉字抖动效果
-                charElement.classList.add('wrong-effect');
-                setTimeout(() => charElement.classList.remove('wrong-effect'), 200);
-                
-                // 停止本次识别
-                if (speechRecognition && isRecognizingActive) {
-                    try { speechRecognition.stop(); } catch(e) {}
-                    isRecognizingActive = false;
-                    speakBtn.classList.remove('recording');
+                if (e.error === 'not-allowed') {
+                    setMic('🔇 需要授权');
+                    setMessage('请点击「允许」使用麦克风', true);
+                } else if (e.error === 'no-speech') {
+                    setMic('🎙️ 未听到');
+                    setMessage('没有听到声音，再试一次', true);
+                } else {
+                    setMic('⚠️ 重试');
+                    setMessage('识别失败，请重试', true);
                 }
                 
-                // 恢复按钮
+                // Edge特殊处理：有时需要重试
                 setTimeout(() => {
-                    if (!isRecognizingActive && currentIdx < TOTAL_COUNT) {
-                        setMicStatusText('🎙️ 再试一次');
+                    if (!isActive && idx < TOTAL) {
+                        setMic('🎙️ 点击重试');
                     }
-                }, 1000);
-            }
-        };
-        
-        return true;
+                }, 1500);
+            };
+            
+            recognition.onend = () => {
+                speakBtn.classList.remove('listening');
+                isActive = false;
+                if (idx < TOTAL && !speakBtn.disabled) {
+                    setMic('🎙️ 点击朗读');
+                }
+            };
+            
+            recognition.onresult = (e) => {
+                const spoken = e.results[0][0].transcript;
+                const target = WORDS[idx];
+                const chnMatch = spoken.match(/[\u4e00-\u9fa5]/);
+                const spokenChar = chnMatch ? chnMatch[0] : '';
+                
+                if (spokenChar === target) {
+                    correctAndNext();
+                } else {
+                    setMessage(`❌ 「${spokenChar || spoken}」≠「${target}」`, true);
+                    setMic('🔁 不对');
+                    charEl.style.transform = 'scale(0.95)';
+                    setTimeout(() => { charEl.style.transform = ''; }, 200);
+                    
+                    if (recognition && isActive) {
+                        try { recognition.stop(); } catch(e) {}
+                        isActive = false;
+                        speakBtn.classList.remove('listening');
+                    }
+                    
+                    setTimeout(() => {
+                        if (!isActive && idx < TOTAL) {
+                            setMic('🎙️ 再试一次');
+                        }
+                    }, 1000);
+                }
+            };
+            
+            return true;
+        } catch(e) {
+            console.error(e);
+            setMessage('初始化失败，请刷新页面', true);
+            return false;
+        }
     }
     
-    // ========== 开始朗读（用户点击触发） ==========
-    function startSpeechRecognition() {
-        // 游戏结束检查
-        if (currentIdx >= TOTAL_COUNT) {
-            showTipMessage('🎯 已完成全部汉字，点击「重来」继续挑战', false);
+    // 开始识别（Edge适配）
+    function startListening() {
+        if (idx >= TOTAL) {
+            setMessage('已完成，点击重置继续');
             return;
         }
         
-        // 初始化识别器
-        if (!speechRecognition) {
-            if (!initSpeechForAndroid()) return;
+        if (!recognition) {
+            if (!initEdgeSpeech()) return;
         }
         
-        // 如果正在识别，先停止
-        if (isRecognizingActive) {
-            try { speechRecognition.stop(); } catch(e) {}
-            setTimeout(() => startSpeechRecognition(), 200);
+        if (isActive) {
+            try { recognition.stop(); } catch(e) {}
+            setTimeout(() => startListening(), 200);
             return;
         }
         
-        // 开始识别（浏览器会自动弹出权限请求，仅首次）
         try {
-            speechRecognition.start();
+            recognition.start();
         } catch(err) {
             console.warn(err);
-            setMicStatusText('🎤 等待授权');
-            showTipMessage('⚠️ 请在弹出的权限窗口中点击「允许」', true);
+            setMic('🎤 等待授权');
+            setMessage('请在弹出的窗口点击「允许」', true);
+            // Edge可能需要重建实例
+            recognition = null;
+            setTimeout(() => {
+                if (!recognition && idx < TOTAL) {
+                    initEdgeSpeech();
+                }
+            }, 500);
         }
     }
     
-    // ========== 重置游戏 ==========
     function resetGame() {
-        // 停止识别
-        if (speechRecognition && isRecognizingActive) {
-            try { speechRecognition.stop(); } catch(e) {}
-            isRecognizingActive = false;
+        if (recognition && isActive) {
+            try { recognition.stop(); } catch(e) {}
+            isActive = false;
         }
-        
-        // 重置状态
-        currentIdx = 0;
-        currentScore = 0;
-        updateGameUI();
-        
-        // 恢复按钮
+        idx = 0;
+        score = 0;
+        updateDisplay();
         speakBtn.disabled = false;
-        speakBtn.classList.remove('recording');
-        
-        // 重置提示
-        setMicStatusText('🎙️ 重新开始');
-        showTipMessage('✨ 已重置，点击「朗读」开始挑战', false);
-        
-        // 2秒后恢复
-        setTimeout(() => {
-            if (currentIdx < TOTAL_COUNT && !isRecognizingActive) {
-                setMicStatusText('🎙️ 点击朗读');
-                tipSpan.innerText = '👇 点击橙色按钮，大声朗读汉字';
-                tipSpan.style.color = '#5a6e3a';
-            }
-        }, 1500);
+        speakBtn.classList.remove('listening');
+        setMessage('✨ 已重置，点击「朗读」开始');
+        setMic('🎙️ 重新开始');
     }
     
-    // ========== 绑定事件 ==========
-    speakBtn.addEventListener('click', startSpeechRecognition);
-    resetBtn.addEventListener('click', resetGame);
+    speakBtn.onclick = startListening;
+    resetBtn.onclick = resetGame;
     
-    // ========== 初始化 ==========
-    updateGameUI();
-    initSpeechForAndroid();
+    updateDisplay();
+    initEdgeSpeech();
     
-    // 友好的初始提示
+    // Edge特殊提示
     setTimeout(() => {
-        if (currentIdx === 0) {
-            tipSpan.innerText = '🎤 点击「朗读」按钮 → 允许麦克风 → 大声读汉字';
-            setMicStatusText('🎙️ 准备就绪');
-        }
+        setMessage('🔊 点击「朗读」→ 允许麦克风 → 大声读字', false);
     }, 500);
-    
-    // 安卓平板额外优化：防止长按菜单
-    document.querySelectorAll('.btn').forEach(btn => {
-        btn.addEventListener('contextmenu', (e) => e.preventDefault());
-        btn.addEventListener('touchstart', () => {});
-    });
 </script>
 </body>
 </html>
